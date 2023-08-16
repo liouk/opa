@@ -7,8 +7,8 @@ session_file=${OPA_SESSION_FILE:-"$HOME/.config/op/.session-token"}
 
 usage () {
   cat <<EOF
-op + fzf = L.F.E. Extend the functionality of 'op' (the 1Password CLI tool) by using
-fzf and persistent sessions.
+opa extends the functionality of 'op' (the 1Password CLI tool) by using fzf and
+persistent sessions.
 
 This tool requires:
   - op: https://1password.com/downloads/command-line/
