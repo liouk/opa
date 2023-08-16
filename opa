@@ -2,8 +2,11 @@
 
 set -e
 
+extras_file=${OPA_EXTRAS_FILE:-"$HOME/.zsh/conf.d/opa-extras.sh"}
+session_file=${OPA_SESSION_FILE:-"$HOME/.config/op/.session-token"}
+
 usage () {
-  source ${OPA_EXTRAS_FILE:-"$HOME/.zsh/conf.d/opa-extras.sh"} 2>/dev/null || true
+  source $extras_file 2>/dev/null || true
   cat <<EOF
 op + fzf = L.F.E. Extend the functionality of 'op' (the 1Password CLI tool) by using
 fzf and persistent sessions.
@@ -68,17 +71,16 @@ EOF
 # sign in to 1password and store the obtained session token
 # in the configured session file
 op_signin () {
-  local op_session_file="$HOME/.config/op/.session-token"
-  if [ -f "$op_session_file" ]; then
-    OP_SESSION=$(cat $op_session_file 2>/dev/null)
+  if [ -f "$session_file" ]; then
+    OP_SESSION=$(cat $session_file 2>/dev/null)
     op --session "$OP_SESSION" user list > /dev/null 2>&1 && return
   else
-    touch "$op_session_file"
+    touch "$session_file"
   fi
 
   OP_SESSION=$(op signin --account my --raw)
-  chmod 600 "$op_session_file"
-  echo -n "$OP_SESSION" > "$op_session_file"
+  chmod 600 "$session_file"
+  echo -n "$OP_SESSION" > "$session_file"
 }
 
 # copy the selected data in the clipboard, send a desktop notification,
@@ -161,7 +163,7 @@ main () {
       ;;
 
     clear)
-      rm -f "$HOME/.config/op/.session-token"
+      rm -f "$session_file"
       exit
       ;;
 
@@ -172,7 +174,7 @@ main () {
   esac
 
   # check any sourced extras
-  source ${OPA_EXTRAS_FILE:-"$HOME/.zsh/conf.d/opa-extras.sh"} 2>/dev/null || true
+  source $extras_file 2>/dev/null || true
   if [[ $(type -t "opa_extras_$cmd") == function ]]; then
     op_signin
     trap restore EXIT
