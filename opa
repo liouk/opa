@@ -101,8 +101,8 @@ copy_and_wait () {
   existing="$(opa_paste)"
   opa_copy "$data"
 
-  local msg = "secret copied to clipboard"
-  [[ $(type -t "opa_notify") == function ]] && { opa_notify "$msg" }
+  local msg="secret copied to clipboard"
+  [[ $(type -t "opa_notify") == function ]] && { opa_notify "$msg"; }
   echo "$msg"
   echo "will clear after 15s"
 
@@ -116,7 +116,7 @@ restore () {
   opa_copy "$existing"
 
   local msg="secret cleared from clipboard"
-  [[ $(type -t "opa_notify") == function ]] && { opa_notify "$msg" }
+  [[ $(type -t "opa_notify") == function ]] && { opa_notify "$msg"; }
   echo "$msg"
 
   exit $exitcode
@@ -164,6 +164,7 @@ cmd_list () {
 main () {
   cmd="$1"
 
+  source $extras_file 2>/dev/null || true
   [[ $(type -t "opa_copy") == function ]] || { echo "error: opa_copy func undefined; see opa --help"; exit 1; }
   [[ $(type -t "opa_paste") == function ]] || { echo "error: opa_paste func undefined; see opa --help"; exit 1; }
 
@@ -186,14 +187,12 @@ main () {
       ;;
 
     -h|--help|help|usage)
-      source $extras_file 2>/dev/null || true
       usage
       exit
       ;;
   esac
 
   # check any sourced extras
-  source $extras_file 2>/dev/null || true
   if [[ $(type -t "opa_extras_$cmd") == function ]]; then
     op_signin
     trap restore EXIT
