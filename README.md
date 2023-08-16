@@ -1,4 +1,4 @@
-# opa
+# :shell: opa
 ```
 opa extends the functionality of 'op' (the 1Password CLI tool) by using fzf and
 persistent sessions.
