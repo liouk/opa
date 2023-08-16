@@ -43,7 +43,7 @@ OPTIONS
 
 EXTRA COMMANDS
   This section documents any extra commands defined. See section 'EXTRAS DEFINITION'
-  for more info.$(opa_usage_extras)
+  for more info.$(opa_usage_extras 2>/dev/null)
 
 EXTRAS DEFINITION
   This script can be extended to run user defined commands, on top of the ones defined
