@@ -64,6 +64,17 @@ EXTRAS DEFINITION
   You can document your extras by writing a func called 'opa_usage_extras' which prints
   the docs within the 'EXTRA COMMANDS' section above. Follow the structure of this doc
   for the best results.
+
+DESKTOP NOTIFICATIONS
+  To enable desktop notifications, define a function in the extras file
+  (\$OPA_EXTRAS_FILE):
+  - opa_notify(msg): pass a single string argument to display in a desktop notification
+
+CLIPBOARD
+  opa needs clipboard integration to function. To adapt to your system, define two
+  functions in the extras file (\$OPA_EXTRAS_FILE):
+  - opa_copy(data): pass a single string argument to copy to clipboard
+  - opa_paste(): returns a single string retrieved from the clipboard
 EOF
 }
 
@@ -87,10 +98,12 @@ op_signin () {
 copy_and_wait () {
   data="$1"
 
-  existing="$(wl-paste)"
-  echo -n "$data" | wl-copy
-  notify-send "secret copied to clipboard"
-  echo "secret copied to clipboard"
+  existing="$(opa_paste)"
+  opa_copy "$data"
+
+  local msg = "secret copied to clipboard"
+  [[ $(type -t "opa_notify") == function ]] && { opa_notify "$msg" }
+  echo "$msg"
   echo "will clear after 15s"
 
   sleep 15
@@ -100,9 +113,12 @@ copy_and_wait () {
 # effectively clear the secret
 restore () {
   exitcode=$?
-  echo -n "$existing" | wl-copy
-  notify-send "secret cleared from clipboard"
-  echo "secret cleared from clipboard"
+  opa_copy "$existing"
+
+  local msg="secret cleared from clipboard"
+  [[ $(type -t "opa_notify") == function ]] && { opa_notify "$msg" }
+  echo "$msg"
+
   exit $exitcode
 }
 
@@ -147,6 +163,9 @@ cmd_list () {
 
 main () {
   cmd="$1"
+
+  [[ $(type -t "opa_copy") == function ]] || { echo "error: opa_copy func undefined; see opa --help"; exit 1; }
+  [[ $(type -t "opa_paste") == function ]] || { echo "error: opa_paste func undefined; see opa --help"; exit 1; }
 
   case "$cmd" in
     ""|list|--choose|-c)
