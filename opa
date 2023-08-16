@@ -6,7 +6,6 @@ extras_file=${OPA_EXTRAS_FILE:-"$HOME/.zsh/conf.d/opa-extras.sh"}
 session_file=${OPA_SESSION_FILE:-"$HOME/.config/op/.session-token"}
 
 usage () {
-  source $extras_file 2>/dev/null || true
   cat <<EOF
 op + fzf = L.F.E. Extend the functionality of 'op' (the 1Password CLI tool) by using
 fzf and persistent sessions.
@@ -168,6 +167,7 @@ main () {
       ;;
 
     -h|--help|help|usage)
+      source $extras_file 2>/dev/null || true
       usage
       exit
       ;;
