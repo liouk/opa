@@ -135,8 +135,6 @@ cmd_list () {
   local selected_id=$(echo -n "$selected" | cut -d' ' -f1)
   all_field_names=()
 
-  # FIXME:
-  # [ERROR] 2023/04/06 15:32:49 "website" isn't a field in the "irinis cluster console" item. This may be because you are trying to access an autofill url, using the `--fields` flag. In order to access urls, you can use `op item get ITEM --format json | jq .urls`
   secret=$(op --session "$OP_SESSION" item get "$selected_id" --fields "type=concealed" --format=json | jq -r '.value' 2>/dev/null) || true
   if [[ "$secret" == "" || "$1" == "--choose" || "$1" == "-c" ]]; then
     while IFS= read -r field; do
