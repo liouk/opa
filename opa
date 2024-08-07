@@ -135,22 +135,22 @@ cmd_list () {
   local selected_id=$(echo -n "$selected" | cut -d' ' -f1)
   all_field_names=()
 
-  secret=$(op --session "$OP_SESSION" item get "$selected_id" --fields "type=concealed" --format=json | jq -r '.value' 2>/dev/null) || true
+  secret=$(op --session "$OP_SESSION" item get "$selected_id" --reveal --fields "type=concealed" --format=json | jq -r '.value' 2>/dev/null) || true
   if [[ "$secret" == "" || "$1" == "--choose" || "$1" == "-c" ]]; then
     while IFS= read -r field; do
       [ "$field" = "Fields:" ] && continue
       field_name=$(echo $field | cut -d':' -f1)
       [[ -z "${field_name// }" ]] || all_field_names+=("$field_name")
-    done <<< $(op --session "$OP_SESSION" item get "$selected_id" | sed -n '/^Fields:$/,$p')
+    done <<< $(op --session "$OP_SESSION" item get "$selected_id" --reveal | sed -n '/^Fields:$/,$p')
 
     echo "Choose field:"
     selected_field=$(printf "%s\n" "${all_field_names[@]}" | fzf --prompt "Field> " --height=~10)
     [ "$selected_field" = "" ] && { echo "no selection; bye"; exit; }
     echo -e "$selected_field\n"
 
-    secret=$(op --session "$OP_SESSION" item get "$selected_id" --field "$selected_field")
+    secret=$(op --session "$OP_SESSION" item get "$selected_id" --reveal --field "$selected_field")
     if [[ "$secret" == otpauth* ]]; then
-      secret=$(op --session "$OP_SESSION" item get "$selected_id" --otp)
+      secret=$(op --session "$OP_SESSION" item get "$selected_id" --reveal --otp)
     fi
     secret=${secret#"\""}
     secret=${secret%"\""}
