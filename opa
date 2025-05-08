@@ -16,10 +16,11 @@ This tool requires:
 
 COMMANDS
 
-  signin
+  signin [-f|--force]
       Sign-in to 1password and store the session token in the file specified
       in \$OPA_SESSION_FILE. By default, this is '$HOME/.config/op/.session-token'.
-      The token is valid for 30 minutes.
+      The token is valid for 30 minutes. Forcing signin will clear any existing
+      session token and obtain a new one.
 
   list [-c|--choose]
       List all items available in the signed in account; sign-in if needed. Then, if
@@ -81,7 +82,10 @@ EOF
 # sign in to 1password and store the obtained session token
 # in the configured session file
 op_signin () {
-  if [ -f "$session_file" ]; then
+	if [[ "$2" == "--force" || "$2" == "-f" ]]; then
+		rm -f "$session_file"
+		touch "$session_file"
+	elif [ -f "$session_file" ]; then
     OP_SESSION=$(cat $session_file 2>/dev/null)
     op --session "$OP_SESSION" user list > /dev/null 2>&1 && return
   else
@@ -175,7 +179,7 @@ main () {
       ;;
 
     signin)
-      op_signin
+      op_signin "$@"
       exit
       ;;
 
